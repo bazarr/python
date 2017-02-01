@@ -19,7 +19,7 @@ def predict():
     # Prediction text
     text = request.args.get('text') if request.args.get('text') else ""
     # Number of predictions
-    predictions = request.args.get('num') if request.args.get('num') else 3
+    predictions = int(request.args.get('num')) if request.args.get('num') else 3
 
     retval = dict()
     slicing_value = -1 * (predictions + 2)
