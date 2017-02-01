@@ -1,1 +1,1 @@
-web: python cat_predict_flask.py
+web: gunicorn cat_predict_flask:app
