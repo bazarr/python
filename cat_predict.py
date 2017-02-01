@@ -1,4 +1,5 @@
 import csv, re, random, os
+import pickle
 from os import listdir
 from os.path import isfile, join
 from sklearn.pipeline import Pipeline
@@ -24,8 +25,7 @@ def trainer(file):
 
 
 def predict(text, predictions=1):
-    #print(stopwords.words("english"))
-    # Remove stopwords from text in the future...
+    
     retval = list()
     slicing_value = -1 * (predictions + 2)
     cat_train.insert(0, text)
@@ -46,3 +46,7 @@ for file in files:
     if file != '.DS_Store':
         category.append(re.sub('.csv', '', file))
         trainer(category_training_path + file)
+
+pickle.dump(cat_train, open("cat_train.p", "wb"))
+pickle.dump(category, open("category.p", "wb"))
+
