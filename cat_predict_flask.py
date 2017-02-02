@@ -34,8 +34,8 @@ def predict():
             retval[category[x-1]] = str(cos_value)
     del cat_train[0]
     response = jsonify(retval)
-    #response.headers.add('Access-Control-Allow-Origin', 'http://localhost:9000')
-    response.headers.add('Access-Control-Allow-Origin', 'https://dashboard.heroku.com/apps/bazarr-web')
+    response.headers.add('Access-Control-Allow-Origin', 'http://localhost:9000')
+    #response.headers.add('Access-Control-Allow-Origin', 'https://dashboard.heroku.com/apps/bazarr-web')
     return response
 
 
