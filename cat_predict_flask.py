@@ -1,4 +1,4 @@
-import csv, re, random, os, json, pickle
+import csv, re, random, os, json
 from os import listdir
 from os.path import isfile, join
 from sklearn.pipeline import Pipeline
@@ -36,11 +36,30 @@ def predict():
 
 
 
-cat_train = pickle.load(open("cat_train.p", "rb"))
-category = pickle.load(open("category.p", "rb"))
+cat_train = list()
+category = list()
+
+def trainer(file):
+    temp = ""
+    with open(file, 'rt') as csvfile:
+        reader = csv.reader(csvfile)
+        for index, row in enumerate(reader):
+            if index is not 1:
+                row_words = re.sub("[^a-zA-Z -]", ' ', row[0].lower())
+                temp += ' ' + str(row_words)
+    temp = re.sub('\s+', ' ', temp)
+    cat_train.append(temp)
+
+
+category_training_path = os.getcwd() + "/Category_Training_Data/"
+files = [f for f in listdir(category_training_path) if isfile(join(category_training_path, f))]
+for file in files:
+    if file != '.DS_Store':
+        category.append(re.sub('.csv', '', file))
+        trainer(category_training_path + file)
 
 
 if __name__ == '__main__':
-    app.run(debug=False)
+    app.run(debug=True)
 
 
