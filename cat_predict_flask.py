@@ -11,7 +11,7 @@ from flask import request
 app = Flask(__name__)
 
 
-@app.route('/')
+@app.route('/predict')
 def predict():
     #print(stopwords.words("english"))
     # Remove stopwords from text in the future...
@@ -36,6 +36,7 @@ def predict():
 
 
 
+# Reading training data and doing cleanups
 cat_train = list()
 category = list()
 
