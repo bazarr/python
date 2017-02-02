@@ -29,10 +29,11 @@ def predict():
     cosine_similarities = linear_kernel(tfidf[0:1], tfidf).flatten()
     related_docs_indices = cosine_similarities.argsort()[-2:slicing_value:-1]
     for index, x in enumerate(list(related_docs_indices)):
-        if list(cosine_similarities)[x] > 0:
-            retval[category[x-1]] = list(cosine_similarities)[x]
+        cos_value = list(cosine_similarities)[x]
+        if cos_value > 0:
+            retval[category[x-1]] = str(cos_value)
     del cat_train[0]
-    return json.dumps(retval)
+    return json.dumps(dict(categories=retval))
 
 
 
