@@ -1,4 +1,4 @@
-import csv, re, random, os, json
+import csv, re, random, os
 from os import listdir
 from os.path import isfile, join
 from sklearn.pipeline import Pipeline
@@ -6,12 +6,12 @@ from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import linear_kernel
 from nltk.corpus import stopwords
-from flask import Flask
-from flask import request
+from flask import Flask, request, jsonify
+
 app = Flask(__name__)
 
+@app.route('/predict', methods =['GET'])
 
-@app.route('/predict')
 def predict():
     #print(stopwords.words("english"))
     # Remove stopwords from text in the future...
@@ -33,7 +33,10 @@ def predict():
         if cos_value > 0:
             retval[category[x-1]] = str(cos_value)
     del cat_train[0]
-    return json.dumps(dict(categories=retval))
+    response = jsonify(retval)
+    #response.headers.add('Access-Control-Allow-Origin', 'http://localhost:9000')
+    response.headers.add('Access-Control-Allow-Origin', 'https://dashboard.heroku.com/apps/bazarr-web')
+    return response
 
 
 
