@@ -5,7 +5,7 @@ from sklearn.pipeline import Pipeline
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import linear_kernel
-from nltk.corpus import stopwords
+from sklearn.feature_extraction import text
 from flask import Flask, request, jsonify
 
 app = Flask(__name__)
@@ -44,7 +44,7 @@ def predict():
 # Reading training data and doing cleanups
 cat_train = list()
 category = list()
-stop = set(stopwords.words('english'))
+stop = text.ENGLISH_STOP_WORDS
 
 def trainer(file):
     temp = ""
