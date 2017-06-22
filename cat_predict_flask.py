@@ -1,4 +1,4 @@
-import csv, re, random, os
+import csv, re, random, os, random, string
 from os import listdir
 from os.path import isfile, join
 from sklearn.pipeline import Pipeline
@@ -7,6 +7,15 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import linear_kernel
 from sklearn.feature_extraction import text
 from flask import Flask, request, jsonify
+from textblob import TextBlob, Word
+
+
+# Reading training data and doing cleanups
+cat_train = list()
+category = list()
+stop = text.ENGLISH_STOP_WORDS
+CORS = 'http://localhost:9000'
+
 
 app = Flask(__name__)
 
@@ -35,16 +44,50 @@ def predict():
             retval[category[x-1]] = str(cos_value)
     del cat_train[0]
     response = jsonify(retval)
-    response.headers.add('Access-Control-Allow-Origin', 'http://localhost:9000')
+    response.headers.add('Access-Control-Allow-Origin', CORS)
     #response.headers.add('Access-Control-Allow-Origin', 'https://dashboard.heroku.com/apps/bazarr-web')
     return response
 
 
+@app.route('/post-tags', methods =['GET'])
 
-# Reading training data and doing cleanups
-cat_train = list()
-category = list()
-stop = text.ENGLISH_STOP_WORDS
+def postTags():
+    retval = {'tags':[]}
+    text = re.sub('%20',' ', request.args.get('text')) if request.args.get('text') else ""
+
+    # Remove characters that are not punctuations, numbers and alphabets
+    text = re.sub('[^a-zA-Z0-9\s.?!-]','' ,text)
+    # Remove extra spaces and tabs
+    text = re.sub('[\s+]', ' ', text)
+
+    print(text)
+
+    blob = TextBlob(text.lower())
+    temp = blob.tags
+
+    for i in range(len(temp)):
+        if temp[i][1] == 'JJ':
+            k = 1
+            found = ''
+            while i+k < len(temp) and k < 2:
+                if temp[i+k][1] == 'NN' or temp[i+k][1] == 'NNP':
+                    if i+k+1 < len(temp) and (temp[i+k+1][1] == 'PRP'):
+                        retval['tags'].append(string.capwords(temp[i][0] + ' ' + temp[i+k][0]) + ' ' + temp[i+k+1][0])
+                    else:
+                        retval['tags'].append(string.capwords(temp[i][0] + ' ' + temp[i+k][0]))
+                    temp[i+k] = (temp[i+k][0],'DONE')
+                    break
+                k+=1
+
+    for i in range(len(temp)):
+        if temp[i][1] == 'NNP' or temp[i][1] == 'VBN' and temp[i][0] not in stop:
+            retval['tags'].append(string.capwords(temp[i][0].lemmatize()))
+
+    retval['tags'] = list(set(retval['tags']))
+    response = jsonify(retval)
+    response.headers.add('Access-Control-Allow-Origin', CORS)
+    return (response)
+        
 
 def trainer(file):
     temp = ""

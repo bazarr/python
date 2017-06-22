@@ -1,13 +1,16 @@
-import csv, re, random, os
+import csv, re, random, os, random, string
 import pickle
 from os import listdir
 from os.path import isfile, join
 from sklearn.pipeline import Pipeline
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.feature_extraction import text
 from sklearn.metrics.pairwise import linear_kernel
 from nltk.corpus import stopwords
+from textblob import TextBlob, Word
 
+stop = text.ENGLISH_STOP_WORDS
 
 cat_train = list()
 category = list()
@@ -38,6 +41,41 @@ def predict(text, predictions=1):
             retval.append([category[x-1], list(cosine_similarities)[x]])
     del cat_train[0]
     return retval
+
+def postTags():
+    with open('post.txt') as f:
+        content = f.readlines()
+    # you may also want to remove whitespace characters like `\n` at the end of each line
+    
+    content = ' '.join(content)
+    content = re.sub('[^a-zA-Z0-9\s.?!-]','' ,content)
+    content = re.sub('[\s+]', ' ', content)
+
+    blob = TextBlob(content.lower())
+
+    temp = blob.tags
+    val = []
+    for i in range(len(temp)):
+        if temp[i][1] == 'JJ':
+            k = 1
+            found = ''
+            while i+k < len(temp) and k < 2:
+                if temp[i+k][1] == 'NN' or temp[i+k][1] == 'NNP':
+                    
+                    if i+k+1 < len(temp) and (temp[i+k+1][1] == 'PRP'):
+                        val.append(string.capwords(temp[i][0] + ' ' + temp[i+k][0]) + ' ' + temp[i+k+1][0])
+                    else:
+                        val.append(string.capwords(temp[i][0] + ' ' + temp[i+k][0]))
+                    temp[i+k] = (temp[i+k][0],'DONE')
+                    break
+                k+=1
+
+    for i in range(len(temp)):
+        if temp[i][1] == 'NNP' or temp[i][1] == 'VBN' and temp[i][0] not in stop:
+            val.append(string.capwords(temp[i][0].lemmatize()))
+
+    print(val)
+
 
 
 category_training_path = os.getcwd() + "/Category_Training_Data/"
