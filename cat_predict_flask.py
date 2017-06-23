@@ -14,7 +14,7 @@ from textblob import TextBlob, Word
 cat_train = list()
 category = list()
 stop = text.ENGLISH_STOP_WORDS
-CORS = 'http://localhost:9000'
+CORS = '*'
 
 
 app = Flask(__name__)
