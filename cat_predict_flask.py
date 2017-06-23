@@ -71,10 +71,7 @@ def postTags():
             found = ''
             while i+k < len(temp) and k < 2:
                 if temp[i+k][1] == 'NN' or temp[i+k][1] == 'NNP':
-                    if i+k+1 < len(temp) and (temp[i+k+1][1] == 'PRP'):
-                        retval['tags'].append(string.capwords(temp[i][0] + ' ' + temp[i+k][0]) + ' ' + temp[i+k+1][0])
-                    else:
-                        retval['tags'].append(string.capwords(temp[i][0] + ' ' + temp[i+k][0]))
+                    retval['tags'].append(string.capwords(temp[i][0] + ' ' + temp[i+k][0]))
                     temp[i+k] = (temp[i+k][0],'DONE')
                     break
                 k+=1
